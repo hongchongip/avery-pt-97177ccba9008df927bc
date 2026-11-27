@@ -1,0 +1,8 @@
+User-agent: WhatsApp
+Allow: /
+
+User-agent: facebookexternalhit
+Allow: /
+
+User-agent: *
+Disallow: /

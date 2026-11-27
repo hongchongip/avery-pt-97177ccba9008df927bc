@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="robots" content="noindex, nofollow, noarchive" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <title>Avery，一定得！｜普通話重點詞語閃卡</title>
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://hongchongip.github.io/avery-pt-97177ccba9008df927bc/" />
+  <meta property="og:title" content="Avery，一定得！｜普通話重點詞語閃卡" />
+  <meta property="og:description" content="點一下聽普通話發音，支援正常速／慢速切換，輕鬆溫習 20 組重點詞語。" />
+  <meta property="og:image" content="https://hongchongip.github.io/avery-pt-97177ccba9008df927bc/og-cover-avery.jpg" />
+  <meta property="og:image:type" content="image/jpeg" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Avery，一定得！｜普通話重點詞語閃卡" />
+  <meta name="twitter:description" content="點一下聽普通話發音，支援正常速／慢速切換，輕鬆溫習 20 組重點詞語。" />
+  <meta name="twitter:image" content="https://hongchongip.github.io/avery-pt-97177ccba9008df927bc/og-cover-avery.jpg" />
+  <style>
+    :root {
+      --bg: #f6f5f2;
+      --card: #ffffff;
+      --ink: #1b1d21;
+      --muted: #6c727f;
+      --border: #e6e3dc;
+      --accent: #3d637d;
+      --accent-soft: #eef3f7;
+      --shadow: 0 12px 32px rgba(27, 29, 33, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang HK", "PingFang TC", "Noto Sans CJK TC", "Microsoft JhengHei", sans-serif;
+      touch-action: manipulation;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    .wrap {
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      padding: max(20px, env(safe-area-inset-top)) 20px max(24px, env(safe-area-inset-bottom));
+      max-width: 480px;
+      margin: 0 auto;
+    }
+
+    header {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 14px;
+      color: var(--muted);
+      padding: 4px 2px;
+    }
+
+    .title {
+      font-weight: 600;
+      color: var(--ink);
+      letter-spacing: 0.02em;
+    }
+
+    .speed-row {
+      width: 100%;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .speed-btn {
+      appearance: none;
+      border: 1.5px solid var(--border);
+      background: var(--card);
+      color: var(--muted);
+      font-size: 15px;
+      font-weight: 600;
+      padding: 11px 14px;
+      border-radius: 14px;
+      cursor: pointer;
+      transition: transform 0.1s ease, background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+      font-family: inherit;
+    }
+
+    .speed-btn:active {
+      transform: scale(0.98);
+    }
+
+    .speed-btn.active {
+      background: var(--accent-soft);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .card {
+      width: 100%;
+      flex: 1;
+      max-height: 430px;
+      margin: 14px 0 16px;
+      background: var(--card);
+      border: 1.5px solid var(--border);
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 28px 20px;
+      position: relative;
+      cursor: pointer;
+      transition: transform 0.12s ease, border-color 0.2s ease, background-color 0.2s ease;
+    }
+
+    .card:active {
+      transform: scale(0.985);
+    }
+
+    .card.heard {
+      border-color: var(--accent);
+      background: #fcfdfe;
+    }
+
+    .lesson-tag {
+      position: absolute;
+      top: 20px;
+      left: 22px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--accent);
+      background: var(--accent-soft);
+      padding: 5px 12px;
+      border-radius: 999px;
+      letter-spacing: 0.04em;
+    }
+
+    .state-dot {
+      position: absolute;
+      top: 22px;
+      right: 22px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .word {
+      font-size: clamp(64px, 19vw, 96px);
+      font-weight: 700;
+      line-height: 1.15;
+      letter-spacing: 0.08em;
+      text-align: center;
+      color: var(--ink);
+      margin: 0;
+      padding-left: 0.08em;
+    }
+
+    .pinyin {
+      margin-top: 22px;
+      font-size: clamp(24px, 6.5vw, 34px);
+      font-weight: 500;
+      color: var(--accent);
+      letter-spacing: 0.06em;
+      text-align: center;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Rounded", "Helvetica Neue", Arial, sans-serif;
+    }
+
+    .hint {
+      position: absolute;
+      bottom: 22px;
+      left: 20px;
+      right: 20px;
+      text-align: center;
+      font-size: 14px;
+      color: var(--muted);
+    }
+
+    .card.heard .hint {
+      color: var(--accent);
+      font-weight: 500;
+    }
+
+    .controls {
+      width: 100%;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .controls button {
+      appearance: none;
+      border: 1.5px solid var(--border);
+      background: var(--card);
+      color: var(--ink);
+      font-size: 16px;
+      font-weight: 600;
+      padding: 14px 16px;
+      border-radius: 16px;
+      cursor: pointer;
+      transition: transform 0.1s ease, background-color 0.15s ease;
+      font-family: inherit;
+    }
+
+    .controls button:active {
+      transform: scale(0.98);
+      background: var(--accent-soft);
+    }
+
+    .controls button.primary {
+      background: var(--accent);
+      color: #ffffff;
+      border-color: var(--accent);
+    }
+
+    .controls button.primary:active {
+      opacity: 0.9;
+    }
+
+    .notice {
+      margin-top: 10px;
+      font-size: 12px;
+      color: var(--muted);
+      text-align: center;
+      min-height: 16px;
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <header>
+      <span class="title">普通話重點詞語</span>
+      <span id="counter">1 / 20</span>
+    </header>
+
+    <div class="speed-row" role="group" aria-label="發音速度">
+      <button id="speedNormalBtn" class="speed-btn active" type="button" aria-pressed="true">正常速</button>
+      <button id="speedSlowBtn" class="speed-btn" type="button" aria-pressed="false">慢速</button>
+    </div>
+
+    <section id="card" class="card" role="button" tabindex="0" aria-label="點擊聽普通話發音，再點一下換下一個詞語">
+      <span id="lesson" class="lesson-tag">第一課</span>
+      <span id="status" class="state-dot">點一下發音</span>
+      <h1 id="word" class="word">六歲</h1>
+      <div id="pinyin" class="pinyin">liù suì</div>
+      <div id="hint" class="hint">點一下聽普通話發音</div>
+    </section>
+
+    <div class="controls">
+      <button id="replayBtn" type="button">🔊 再聽一次</button>
+      <button id="nextBtn" class="primary" type="button">下一個詞 →</button>
+    </div>
+
+    <div id="notice" class="notice"></div>
+  </main>
+
+  <script>
+    const WORDS = [
+      { lesson: "第一課", text: "六歲", speak: "六岁", pinyin: "liù suì" },
+      { lesson: "第一課", text: "請問", speak: "请问", pinyin: "qǐng wèn" },
+      { lesson: "第一課", text: "甚麼", speak: "什么", pinyin: "shén me" },
+      { lesson: "第一課", text: "名字", speak: "名字", pinyin: "míng zi" },
+      { lesson: "第一課", text: "一年級", speak: "一年级", pinyin: "yī nián jí" },
+      { lesson: "第二課", text: "爸爸", speak: "爸爸", pinyin: "bà ba" },
+      { lesson: "第二課", text: "媽媽", speak: "妈妈", pinyin: "mā ma" },
+      { lesson: "第二課", text: "姐姐", speak: "姐姐", pinyin: "jiě jie" },
+      { lesson: "第二課", text: "弟弟", speak: "弟弟", pinyin: "dì di" },
+      { lesson: "第二課", text: "六口人", speak: "六口人", pinyin: "liù kǒu rén" },
+      { lesson: "第三課", text: "最愛", speak: "最爱", pinyin: "zuì ài" },
+      { lesson: "第三課", text: "好吃", speak: "好吃", pinyin: "hǎo chī" },
+      { lesson: "第三課", text: "咱們", speak: "咱们", pinyin: "zán men" },
+      { lesson: "第三課", text: "健康", speak: "健康", pinyin: "jiàn kāng" },
+      { lesson: "第三課", text: "小賣部", speak: "小卖部", pinyin: "xiǎo mài bù" },
+      { lesson: "第四課", text: "哪裏", speak: "哪里", pinyin: "nǎ li" },
+      { lesson: "第四課", text: "音樂室", speak: "音乐室", pinyin: "yīn yuè shì" },
+      { lesson: "第四課", text: "旁邊", speak: "旁边", pinyin: "páng biān" },
+      { lesson: "第四課", text: "樓梯口", speak: "楼梯口", pinyin: "lóu tī kǒu" },
+      { lesson: "第四課", text: "廣播室", speak: "广播室", pinyin: "guǎng bō shì" }
+    ];
+
+    const cardEl = document.getElementById("card");
+    const lessonEl = document.getElementById("lesson");
+    const statusEl = document.getElementById("status");
+    const wordEl = document.getElementById("word");
+    const pinyinEl = document.getElementById("pinyin");
+    const hintEl = document.getElementById("hint");
+    const counterEl = document.getElementById("counter");
+    const noticeEl = document.getElementById("notice");
+    const replayBtn = document.getElementById("replayBtn");
+    const nextBtn = document.getElementById("nextBtn");
+    const speedNormalBtn = document.getElementById("speedNormalBtn");
+    const speedSlowBtn = document.getElementById("speedSlowBtn");
+
+    let deck = [];
+    let current = null;
+    let seenInRound = 0;
+    let hasPlayedCurrent = false;
+    let cachedVoice = null;
+    let speechRate = 1.0;
+
+    function setSpeed(mode) {
+      speechRate = mode === "slow" ? 0.55 : 1.0;
+      const isSlow = mode === "slow";
+      speedNormalBtn.classList.toggle("active", !isSlow);
+      speedNormalBtn.setAttribute("aria-pressed", String(!isSlow));
+      speedSlowBtn.classList.toggle("active", isSlow);
+      speedSlowBtn.setAttribute("aria-pressed", String(isSlow));
+    }
+
+    function pickZhCnVoice() {
+      if (!("speechSynthesis" in window)) return null;
+      const voices = window.speechSynthesis.getVoices() || [];
+      if (!voices.length) return null;
+      const exact = voices.find(v => /^zh[-_]CN$/i.test(v.lang));
+      if (exact) return exact;
+      const mandarin = voices.find(v => /^zh/i.test(v.lang) && !/HK|yue/i.test(v.lang));
+      return mandarin || voices.find(v => /^zh/i.test(v.lang)) || null;
+    }
+
+    if ("speechSynthesis" in window) {
+      cachedVoice = pickZhCnVoice();
+      window.speechSynthesis.onvoiceschanged = () => {
+        cachedVoice = pickZhCnVoice();
+      };
+    }
+
+    function refillDeck(lastText) {
+      const copy = WORDS.slice();
+      for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      if (lastText && copy.length > 1 && copy[copy.length - 1].text === lastText) {
+        [copy[0], copy[copy.length - 1]] = [copy[copy.length - 1], copy[0]];
+      }
+      deck = copy;
+      seenInRound = 0;
+    }
+
+    function renderWord(item) {
+      current = item;
+      hasPlayedCurrent = false;
+      lessonEl.textContent = item.lesson;
+      wordEl.textContent = item.text;
+      pinyinEl.textContent = item.pinyin;
+      statusEl.textContent = "點一下發音";
+      hintEl.textContent = "點一下聽普通話發音";
+      cardEl.classList.remove("heard");
+      counterEl.textContent = `${seenInRound} / ${WORDS.length}`;
+    }
+
+    function showNextWord() {
+      if ("speechSynthesis" in window) {
+        window.speechSynthesis.cancel();
+      }
+      if (deck.length === 0) {
+        refillDeck(current ? current.text : null);
+      }
+      const next = deck.pop();
+      seenInRound += 1;
+      renderWord(next);
+    }
+
+    function speakCurrent() {
+      if (!current) return;
+      if (!("speechSynthesis" in window)) {
+        noticeEl.textContent = "此瀏覽器未支援語音朗讀，請用 Safari 或 Chrome 開啟。";
+        hasPlayedCurrent = true;
+        cardEl.classList.add("heard");
+        statusEl.textContent = "再點換詞";
+        hintEl.textContent = "再點一下換下一個詞";
+        return;
+      }
+
+      noticeEl.textContent = "";
+      window.speechSynthesis.cancel();
+      const utter = new SpeechSynthesisUtterance(current.speak);
+      utter.lang = "zh-CN";
+      utter.rate = speechRate;
+      utter.pitch = 1.0;
+      const voice = cachedVoice || pickZhCnVoice();
+      if (voice) utter.voice = voice;
+
+      hasPlayedCurrent = true;
+      cardEl.classList.add("heard");
+      statusEl.textContent = "🔊 播放中";
+      hintEl.textContent = "再點一下換下一個詞";
+
+      utter.onend = () => {
+        statusEl.textContent = "已播・再點換詞";
+      };
+      utter.onerror = () => {
+        statusEl.textContent = "再點換詞";
+      };
+
+      window.speechSynthesis.speak(utter);
+    }
+
+    speedNormalBtn.addEventListener("click", () => setSpeed("normal"));
+    speedSlowBtn.addEventListener("click", () => setSpeed("slow"));
+
+    cardEl.addEventListener("click", () => {
+      if (!hasPlayedCurrent) {
+        speakCurrent();
+      } else {
+        showNextWord();
+      }
+    });
+
+    cardEl.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        cardEl.click();
+      }
+    });
+
+    replayBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      speakCurrent();
+    });
+
+    nextBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      showNextWord();
+    });
+
+    showNextWord();
+  </script>
+</body>
+</html>
