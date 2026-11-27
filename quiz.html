@@ -622,6 +622,8 @@
     let results = [];
     let cachedVoice = null;
     let speechRate = 1.0;
+    let isAdvancing = false;
+    let advanceTimer = null;
 
     function setSpeed(mode) {
       speechRate = mode === "slow" ? 0.55 : 1.0;
@@ -715,9 +717,6 @@
     }
 
     function showResults() {
-      if ("speechSynthesis" in window) {
-        window.speechSynthesis.cancel();
-      }
       quizViewEl.classList.add("hidden");
       resultsViewEl.classList.remove("hidden");
       wrapEl.classList.add("results-mode");
@@ -777,13 +776,15 @@
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
 
-    function recordAnswer(isCorrect) {
-      const item = deck[currentIndex];
-      if (!item) return;
-      if ("speechSynthesis" in window) {
-        window.speechSynthesis.cancel();
+    function finishAdvance() {
+      if (advanceTimer) {
+        clearTimeout(advanceTimer);
+        advanceTimer = null;
       }
-      results.push({ item, correct: isCorrect });
+      if (!isAdvancing) return;
+      isAdvancing = false;
+      rightBtn.disabled = false;
+      wrongBtn.disabled = false;
       currentIndex += 1;
       updateHeader();
 
@@ -794,7 +795,56 @@
       }
     }
 
+    function recordAnswer(isCorrect) {
+      if (isAdvancing) return;
+      const item = deck[currentIndex];
+      if (!item) return;
+
+      isAdvancing = true;
+      rightBtn.disabled = true;
+      wrongBtn.disabled = true;
+      results.push({ item, correct: isCorrect });
+      updateHeader();
+
+      const label = isCorrect ? "✓ 啱" : "✕ 唔啱";
+      cardEl.classList.add("heard");
+      statusEl.textContent = `${label}・🔊 朗讀中`;
+      hintEl.textContent = "讀完自動跳去下一個詞…";
+
+      if (!("speechSynthesis" in window)) {
+        advanceTimer = setTimeout(finishAdvance, 450);
+        return;
+      }
+
+      const fallbackMs = speechRate < 0.8 ? 3200 : 2200;
+      advanceTimer = setTimeout(finishAdvance, fallbackMs);
+
+      speakText(item.speak, (utter) => {
+        utter.onend = () => {
+          if (advanceTimer) {
+            clearTimeout(advanceTimer);
+            advanceTimer = null;
+          }
+          advanceTimer = setTimeout(finishAdvance, 250);
+        };
+        utter.onerror = () => {
+          if (advanceTimer) {
+            clearTimeout(advanceTimer);
+            advanceTimer = null;
+          }
+          advanceTimer = setTimeout(finishAdvance, 250);
+        };
+      });
+    }
+
     function startRound(sourceWords) {
+      if (advanceTimer) {
+        clearTimeout(advanceTimer);
+        advanceTimer = null;
+      }
+      isAdvancing = false;
+      rightBtn.disabled = false;
+      wrongBtn.disabled = false;
       if ("speechSynthesis" in window) {
         window.speechSynthesis.cancel();
       }
