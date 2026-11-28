@@ -157,12 +157,8 @@
       justify-content: center;
       padding: 68px 18px 62px;
       position: relative;
-      cursor: pointer;
-      transition: transform 0.12s ease, border-color 0.2s ease, background-color 0.2s ease;
-    }
-
-    .card:active {
-      transform: scale(0.985);
+      cursor: default;
+      transition: border-color 0.2s ease, background-color 0.2s ease;
     }
 
     .card.heard {
@@ -194,30 +190,64 @@
       color: var(--muted);
     }
 
-    .word {
-      font-size: clamp(1.45rem, 5.2vw, 2.15rem);
+    .clauses {
+      width: 100%;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: stretch;
+      gap: 8px;
+      max-width: 100%;
+      padding: 0 2px;
+    }
+
+    .clause-chip {
+      appearance: none;
+      border: 1.5px solid var(--border);
+      background: #faf9f6;
+      border-radius: 16px;
+      padding: 10px 12px 8px;
+      min-height: 58px;
+      min-width: 4.5em;
+      max-width: 100%;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      font-family: inherit;
+      transition: transform 0.1s ease, background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .clause-chip:active {
+      transform: scale(0.97);
+    }
+
+    .clause-chip.is-active {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+      box-shadow: 0 0 0 2px rgba(61, 99, 125, 0.14);
+    }
+
+    .clause-text {
+      font-size: clamp(1.22rem, 4.8vw, 1.85rem);
       font-weight: 700;
-      line-height: 1.45;
+      line-height: 1.4;
       letter-spacing: 0.03em;
       text-align: center;
       color: var(--ink);
-      margin: 0;
-      max-width: 100%;
-      padding: 0 2px;
       overflow-wrap: anywhere;
       word-break: break-word;
     }
 
-    .pinyin {
-      margin-top: 14px;
-      font-size: clamp(1.02rem, 3.7vw, 1.28rem);
+    .clause-pinyin {
+      font-size: clamp(0.84rem, 3.3vw, 1.05rem);
       font-weight: 500;
-      line-height: 1.45;
-      color: var(--accent);
-      letter-spacing: 0.03em;
+      line-height: 1.35;
+      letter-spacing: 0.02em;
       text-align: center;
-      max-width: 100%;
-      padding: 0 2px;
+      color: var(--accent);
       overflow-wrap: break-word;
       font-family: -apple-system, BlinkMacSystemFont, "SF Pro Rounded", "Helvetica Neue", Arial, sans-serif;
     }
@@ -551,12 +581,9 @@
       align-items: center;
       justify-content: space-between;
       gap: 12px;
-      cursor: pointer;
-      transition: transform 0.1s ease, background-color 0.15s ease;
-    }
-
-    .result-row:active {
-      transform: scale(0.99);
+      cursor: default;
+      align-items: flex-start;
+      transition: background-color 0.15s ease;
     }
 
     .result-row.is-right {
@@ -644,6 +671,58 @@
       border: 1px solid var(--bad-border);
     }
 
+    .row-clauses {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      width: 100%;
+    }
+
+    .row-clause {
+      appearance: none;
+      border: 1.5px solid var(--border);
+      background: #faf9f6;
+      border-radius: 12px;
+      padding: 7px 9px 6px;
+      min-height: 44px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 2px;
+      font-family: inherit;
+      transition: transform 0.1s ease, background-color 0.15s ease, border-color 0.15s ease;
+    }
+
+    .row-clause:active {
+      transform: scale(0.97);
+    }
+
+    .row-clause.is-active {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+    }
+
+    .row-clause-text {
+      font-size: 16px;
+      font-weight: 700;
+      line-height: 1.35;
+      letter-spacing: 0.02em;
+      color: var(--ink);
+      overflow-wrap: anywhere;
+      word-break: break-word;
+      text-align: left;
+    }
+
+    .row-clause-pinyin {
+      font-size: 12px;
+      font-weight: 500;
+      line-height: 1.3;
+      color: var(--accent);
+      overflow-wrap: anywhere;
+      text-align: left;
+    }
+
     .results-actions {
       width: 100%;
       display: flex;
@@ -702,12 +781,11 @@
         <button id="speedSlowBtn" class="speed-btn" type="button" aria-pressed="false">慢速</button>
       </div>
 
-      <section id="card" class="card" role="button" tabindex="0" aria-label="點擊聽普通話發音">
+      <section id="card" class="card" aria-label="課文句子，篤其中一句短句聽發音">
         <span id="lesson" class="lesson-tag">第一課《你叫甚麼名字？》</span>
-        <span id="status" class="state-dot">點一下發音</span>
-        <h1 id="word" class="word">你好，我叫李可成。請問你叫甚麼名字？</h1>
-        <div id="pinyin" class="pinyin">Nǐ hǎo, wǒ jiào Lǐ Kěchéng. Qǐng wèn nǐ jiào shén me míng zi?</div>
-        <div id="hint" class="hint">點一下聽普通話發音・下方揀 ✓ 或 ✕</div>
+        <span id="status" class="state-dot">篤一句短句發音</span>
+        <div id="clauses" class="clauses"></div>
+        <div id="hint" class="hint">篤其中一句短句聽發音・下方揀 ✓ 或 ✕</div>
       </section>
 
       <div>
@@ -753,7 +831,7 @@
         <span id="summaryWrongPill" class="pill bad">✕ 唔啱 0 句</span>
       </div>
 
-      <p class="results-hint">點任何一句可以即刻重聽普通話發音</p>
+      <p class="results-hint">篤其中一句短句可以重聽普通話發音</p>
 
       <div id="resultsList" class="results-list"></div>
 
@@ -785,14 +863,42 @@
       { lesson: "第四課《請問在哪裏？》", text: "好的，謝謝。", speak: "好的，谢谢。", pinyin: "Hǎo de, xiè xie." }
     ];
 
+    function splitClauses(str, kind) {
+      const punct = kind === "latin" ? ",.?!;" : "，。？！；、";
+      const re = new RegExp("[^" + punct + "]+[" + punct + "]?", "g");
+      return (str.match(re) || []).map((part) => part.trim()).filter(Boolean);
+    }
+
+    function withClauses(item) {
+      const textParts = splitClauses(item.text, "zh");
+      const pinyinParts = splitClauses(item.pinyin, "latin");
+      const speakParts = splitClauses(item.speak, "zh");
+      if (textParts.length !== pinyinParts.length || textParts.length !== speakParts.length) {
+        throw new Error(
+          "Clause mismatch for 「" + item.text + "」 text=" +
+          textParts.length + " pinyin=" + pinyinParts.length + " speak=" + speakParts.length
+        );
+      }
+      return Object.assign({}, item, {
+        clauses: textParts.map((text, i) => ({
+          text,
+          pinyin: pinyinParts[i],
+          speak: speakParts[i]
+        }))
+      });
+    }
+
+    WORDS.forEach((item, i) => {
+      WORDS[i] = withClauses(item);
+    });
+
     const wrapEl = document.getElementById("wrap");
     const quizViewEl = document.getElementById("quizView");
     const resultsViewEl = document.getElementById("resultsView");
     const cardEl = document.getElementById("card");
     const lessonEl = document.getElementById("lesson");
     const statusEl = document.getElementById("status");
-    const wordEl = document.getElementById("word");
-    const pinyinEl = document.getElementById("pinyin");
+    const clausesEl = document.getElementById("clauses");
     const hintEl = document.getElementById("hint");
     const counterEl = document.getElementById("counter");
     const tallyEl = document.getElementById("tally");
@@ -820,6 +926,7 @@
     let lastCheer = null;
     let isAdvancing = false;
     let advanceTimer = null;
+    let lastPlayedClauseIndex = -1;
 
     function setSpeed(mode) {
       speechRate = mode === "slow" ? 0.55 : 1.0;
@@ -958,18 +1065,39 @@
       window.speechSynthesis.speak(utter);
     }
 
-    function speakCurrent() {
+    function highlightClause(container, index) {
+      if (!container) return;
+      container.querySelectorAll(".clause-chip, .row-clause").forEach((el, i) => {
+        el.classList.toggle("is-active", i === index);
+      });
+    }
+
+    function speakClause(item, index, onStartUi) {
+      if (!item || !item.clauses || !item.clauses[index]) return;
+      lastPlayedClauseIndex = index;
+      speakText(item.clauses[index].speak, (utter) => {
+        if (onStartUi) onStartUi(utter);
+      });
+    }
+
+    function speakLastOrHint() {
       const item = deck[currentIndex];
       if (!item) return;
-      speakText(item.speak, (utter) => {
+      if (lastPlayedClauseIndex < 0 || !item.clauses[lastPlayedClauseIndex]) {
+        noticeEl.textContent = "請先篤其中一句短句聽發音。";
+        statusEl.textContent = "篤一句短句發音";
+        return;
+      }
+      speakClause(item, lastPlayedClauseIndex, (utter) => {
         cardEl.classList.add("heard");
         statusEl.textContent = "🔊 播放中";
-        hintEl.textContent = "聽完揀下方 ✓（啱）或 ✕（唔啱）";
+        noticeEl.textContent = "";
+        highlightClause(clausesEl, lastPlayedClauseIndex);
         utter.onend = () => {
           statusEl.textContent = "已播放";
         };
         utter.onerror = () => {
-          statusEl.textContent = "點一下再播";
+          statusEl.textContent = "再篤一次";
         };
       });
     }
@@ -977,11 +1105,43 @@
     function renderCard() {
       const item = deck[currentIndex];
       if (!item) return;
+      lastPlayedClauseIndex = -1;
       lessonEl.textContent = item.lesson;
-      wordEl.textContent = item.text;
-      pinyinEl.textContent = item.pinyin;
-      statusEl.textContent = "點一下發音";
-      hintEl.textContent = "點一下聽普通話發音・下方揀 ✓ 或 ✕";
+      clausesEl.innerHTML = "";
+      item.clauses.forEach((clause, index) => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "clause-chip";
+        btn.setAttribute("aria-label", "聽發音：" + clause.text);
+        const textSpan = document.createElement("span");
+        textSpan.className = "clause-text";
+        textSpan.textContent = clause.text;
+        const pinyinSpan = document.createElement("span");
+        pinyinSpan.className = "clause-pinyin";
+        pinyinSpan.textContent = clause.pinyin;
+        btn.appendChild(textSpan);
+        btn.appendChild(pinyinSpan);
+        btn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          if (isAdvancing) return;
+          speakClause(item, index, (utter) => {
+            cardEl.classList.add("heard");
+            statusEl.textContent = "🔊 播放中";
+            hintEl.textContent = "聽完揀下方 ✓（啱）或 ✕（唔啱）";
+            noticeEl.textContent = "";
+            highlightClause(clausesEl, index);
+            utter.onend = () => {
+              statusEl.textContent = "已播放";
+            };
+            utter.onerror = () => {
+              statusEl.textContent = "再篤一次";
+            };
+          });
+        });
+        clausesEl.appendChild(btn);
+      });
+      statusEl.textContent = "篤一句短句發音";
+      hintEl.textContent = "篤其中一句短句聽發音・下方揀 ✓ 或 ✕";
       cardEl.classList.remove("heard");
       updateHeader();
     }
@@ -1016,32 +1176,43 @@
       results.forEach((entry, idx) => {
         const row = document.createElement("div");
         row.className = `result-row ${entry.correct ? "is-right" : "is-wrong"}`;
-        row.setAttribute("role", "button");
-        row.setAttribute("tabindex", "0");
-        row.setAttribute("aria-label", `${entry.item.text}，${entry.correct ? "答啱" : "答錯"}，點擊聽發音`);
+        row.setAttribute("aria-label", `${entry.item.text}，${entry.correct ? "答啱" : "答錯"}`);
 
         row.innerHTML = `
           <div class="row-left">
             <span class="row-num">${idx + 1}</span>
             <div class="row-text">
-              <div class="row-word-line">
-                <span class="row-word">${entry.item.text}</span>
-                <span class="row-pinyin">${entry.item.pinyin}</span>
-              </div>
-              <span class="row-lesson">${entry.item.lesson}</span>
+              <div class="row-clauses"></div>
+              <span class="row-lesson"></span>
             </div>
           </div>
           <span class="row-badge ${entry.correct ? "ok" : "bad"}">${entry.correct ? "✓ 啱" : "✕ 唔啱"}</span>
         `;
+        row.querySelector(".row-lesson").textContent = entry.item.lesson;
 
-        const playRow = () => speakText(entry.item.speak);
-        row.addEventListener("click", playRow);
-        row.addEventListener("keydown", (e) => {
-          if (e.key === "Enter" || e.key === " ") {
-            e.preventDefault();
-            playRow();
-          }
+        const clausesWrap = row.querySelector(".row-clauses");
+        entry.item.clauses.forEach((clause, cIdx) => {
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "row-clause";
+          btn.setAttribute("aria-label", "聽發音：" + clause.text);
+          const textSpan = document.createElement("span");
+          textSpan.className = "row-clause-text";
+          textSpan.textContent = clause.text;
+          const pinyinSpan = document.createElement("span");
+          pinyinSpan.className = "row-clause-pinyin";
+          pinyinSpan.textContent = clause.pinyin;
+          btn.appendChild(textSpan);
+          btn.appendChild(pinyinSpan);
+          btn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            speakClause(entry.item, cIdx, () => {
+              highlightClause(clausesWrap, cIdx);
+            });
+          });
+          clausesWrap.appendChild(btn);
         });
+
         resultsListEl.appendChild(row);
       });
 
@@ -1087,33 +1258,12 @@
 
       const label = isCorrect ? "✓ 啱" : "✕ 唔啱";
       cardEl.classList.add("heard");
-      statusEl.textContent = `${label}・🔊 朗讀中`;
-      hintEl.textContent = "讀完自動跳去下一句…";
-
-      if (!("speechSynthesis" in window)) {
-        advanceTimer = setTimeout(finishAdvance, 450);
-        return;
+      statusEl.textContent = label;
+      hintEl.textContent = "即將跳去下一句…";
+      if ("speechSynthesis" in window) {
+        window.speechSynthesis.cancel();
       }
-
-      const fallbackMs = speechRate < 0.8 ? Math.max(5500, item.speak.length * 520) : Math.max(3200, item.speak.length * 320);
-      advanceTimer = setTimeout(finishAdvance, fallbackMs);
-
-      speakText(item.speak, (utter) => {
-        utter.onend = () => {
-          if (advanceTimer) {
-            clearTimeout(advanceTimer);
-            advanceTimer = null;
-          }
-          advanceTimer = setTimeout(finishAdvance, 250);
-        };
-        utter.onerror = () => {
-          if (advanceTimer) {
-            clearTimeout(advanceTimer);
-            advanceTimer = null;
-          }
-          advanceTimer = setTimeout(finishAdvance, 250);
-        };
-      });
+      advanceTimer = setTimeout(finishAdvance, 450);
     }
 
     function startRound(sourceWords) {
@@ -1124,6 +1274,7 @@
       isAdvancing = false;
       rightBtn.disabled = false;
       wrongBtn.disabled = false;
+      lastPlayedClauseIndex = -1;
       if ("speechSynthesis" in window) {
         window.speechSynthesis.cancel();
       }
@@ -1143,17 +1294,10 @@
     speedNormalBtn.addEventListener("click", () => setSpeed("normal"));
     speedSlowBtn.addEventListener("click", () => setSpeed("slow"));
 
-    cardEl.addEventListener("click", () => speakCurrent());
-    cardEl.addEventListener("keydown", (e) => {
-      if (e.key === "Enter" || e.key === " ") {
-        e.preventDefault();
-        speakCurrent();
-      }
-    });
-
     replayBtn.addEventListener("click", (e) => {
       e.stopPropagation();
-      speakCurrent();
+      if (isAdvancing) return;
+      speakLastOrHint();
     });
 
     rightBtn.addEventListener("click", () => recordAnswer(true));
