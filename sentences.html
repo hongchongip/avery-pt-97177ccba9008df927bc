@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-HK">
+<html lang="zh-HK" class="cover-page">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
@@ -759,10 +759,131 @@
       color: var(--bad);
       border-color: var(--bad-border);
     }
+
+    html.cover-page,
+    html.cover-page body {
+      background: #f6c2d4;
+      overflow: hidden;
+      height: 100%;
+    }
+
+    .cover-view {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      background:
+        radial-gradient(120% 80% at 70% 38%, #ffe8f0 0%, #f7c3d2 52%, #f0b4c8 100%);
+      padding:
+        max(16px, env(safe-area-inset-top))
+        max(16px, env(safe-area-inset-right))
+        max(24px, env(safe-area-inset-bottom))
+        max(16px, env(safe-area-inset-left));
+      cursor: pointer;
+    }
+
+    .cover-art {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      object-position: center;
+      pointer-events: none;
+      user-select: none;
+      -webkit-user-select: none;
+      display: block;
+    }
+
+    /* Landscape / wide screens can fill the viewport without cropping Rumi or the Avery title. */
+    @media (min-aspect-ratio: 1200 / 630) {
+      .cover-art {
+        object-fit: cover;
+      }
+    }
+
+    .cover-bottom {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      padding: 56px 8px 4px;
+      background: linear-gradient(
+        to top,
+        rgba(246, 194, 212, 0.96) 0%,
+        rgba(246, 194, 212, 0.72) 48%,
+        rgba(246, 194, 212, 0) 100%
+      );
+    }
+
+    .cover-kicker {
+      font-size: 14px;
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      color: #8b1a4a;
+      background: rgba(255, 255, 255, 0.86);
+      border: 1.5px solid rgba(246, 210, 122, 0.95);
+      padding: 5px 12px;
+      border-radius: 999px;
+      box-shadow: 0 4px 12px rgba(139, 26, 74, 0.08);
+    }
+
+    .cover-start-btn {
+      appearance: none;
+      border: 1.5px solid rgba(255, 255, 255, 0.95);
+      background: rgba(255, 255, 255, 0.94);
+      color: #8b1a4a;
+      font-size: 20px;
+      font-weight: 800;
+      padding: 16px 28px;
+      border-radius: 999px;
+      cursor: pointer;
+      font-family: inherit;
+      min-width: min(86vw, 320px);
+      box-shadow: 0 10px 28px rgba(139, 26, 74, 0.22);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      transition: transform 0.12s ease, background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+    }
+
+    .cover-start-btn:active {
+      transform: scale(0.98);
+    }
+
+    .cover-start-btn.is-playing {
+      background: #8b1a4a;
+      color: #ffffff;
+      border-color: #8b1a4a;
+      animation: none;
+    }
+
+    @keyframes coverPulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.035); }
+    }
+
+    .cover-start-btn.is-waiting {
+      animation: coverPulse 1.6s ease-in-out infinite;
+    }
   </style>
 </head>
 <body>
-  <main id="wrap" class="wrap">
+  <section id="coverView" class="cover-view" aria-label="開場封面">
+    <img class="cover-art" src="og-cover-avery.jpg?v=3" alt="Rumi 為 Avery 打氣：Avery，一定得！" />
+    <div class="cover-bottom">
+      <div class="cover-kicker">普通話課文朗讀</div>
+      <button id="coverStartBtn" class="cover-start-btn is-waiting" type="button">點一下開始</button>
+    </div>
+    <audio id="rumiIntroAudio" src="rumi-intro.mp3" preload="auto" playsinline></audio>
+  </section>
+
+  <main id="wrap" class="wrap hidden">
     <header>
       <span class="title">課文朗讀測驗</span>
       <div class="progress-meta">
@@ -890,6 +1011,9 @@
     });
 
     const wrapEl = document.getElementById("wrap");
+    const coverViewEl = document.getElementById("coverView");
+    const coverStartBtn = document.getElementById("coverStartBtn");
+    const introAudio = document.getElementById("rumiIntroAudio");
     const quizViewEl = document.getElementById("quizView");
     const resultsViewEl = document.getElementById("resultsView");
     const cardEl = document.getElementById("card");
@@ -1314,7 +1438,211 @@
     });
 
 
-    startRound(WORDS);
+    const INTRO_LINE = "Avery，加油呀，你一定做到㗎";
+    const INTRO_EXIT_MS = 300;
+    const AUTOPLAY_GRACE_MS = 700;
+
+    let coverFinished = false;
+    let introStarted = false;
+    let introToken = 0;
+
+    function finishCoverAndEnterQuiz() {
+      if (coverFinished) return;
+      coverFinished = true;
+      if (introAudio) {
+        try { introAudio.pause(); } catch (err) {}
+      }
+      coverViewEl.classList.add("hidden");
+      wrapEl.classList.remove("hidden");
+      document.documentElement.classList.remove("cover-page");
+      startRound(WORDS);
+    }
+
+    function exitAfterIntro() {
+      setTimeout(finishCoverAndEnterQuiz, INTRO_EXIT_MS);
+    }
+
+    function setCoverPlaying(isPlaying) {
+      coverStartBtn.classList.toggle("is-playing", isPlaying);
+      coverStartBtn.classList.toggle("is-waiting", !isPlaying);
+      coverStartBtn.disabled = isPlaying;
+      coverStartBtn.textContent = isPlaying ? "Rumi 打氣緊…" : "點一下開始";
+    }
+
+    function setCoverWaiting() {
+      introStarted = false;
+      coverStartBtn.disabled = false;
+      coverStartBtn.classList.add("is-waiting");
+      coverStartBtn.classList.remove("is-playing");
+      coverStartBtn.textContent = "點一下開始";
+    }
+
+    function markIntroStarted() {
+      if (coverFinished) return;
+      introStarted = true;
+      setCoverPlaying(true);
+    }
+
+    function isMp3ActuallyPlaying() {
+      return !!(introAudio && !introAudio.paused && !introAudio.ended);
+    }
+
+    function isSpeechActuallyPlaying() {
+      return !!("speechSynthesis" in window && (window.speechSynthesis.speaking || window.speechSynthesis.pending));
+    }
+
+    function playIntroSpeech(token) {
+      return new Promise((resolve) => {
+        if (!("speechSynthesis" in window)) {
+          resolve(false);
+          return;
+        }
+        try { window.speechSynthesis.cancel(); } catch (err) {}
+        const utter = new SpeechSynthesisUtterance(INTRO_LINE);
+        const voice = cachedCheerVoice || pickCheerVoice();
+        if (voice) {
+          utter.voice = voice;
+          utter.lang = voice.lang || "zh-HK";
+        } else {
+          utter.lang = "zh-HK";
+        }
+        utter.rate = 1.08;
+        utter.pitch = 1.28;
+        let settled = false;
+        const settle = (ok) => {
+          if (settled) return;
+          settled = true;
+          resolve(token !== introToken ? "stale" : ok);
+        };
+        utter.onend = () => settle(true);
+        utter.onerror = () => settle(false);
+        try {
+          window.speechSynthesis.speak(utter);
+        } catch (err) {
+          settle(false);
+          return;
+        }
+        setTimeout(() => {
+          if (settled) return;
+          if (token !== introToken) {
+            settle("stale");
+            return;
+          }
+          if (isSpeechActuallyPlaying()) {
+            markIntroStarted();
+          } else {
+            settle(false);
+          }
+        }, AUTOPLAY_GRACE_MS);
+      });
+    }
+
+    function playIntroMp3(token) {
+      return new Promise((resolve) => {
+        if (!introAudio || !introAudio.getAttribute("src")) {
+          resolve("missing");
+          return;
+        }
+        let settled = false;
+        const settle = (value) => {
+          if (settled) return;
+          settled = true;
+          introAudio.onended = null;
+          introAudio.onerror = null;
+          resolve(token !== introToken && value !== "stale" ? "stale" : value);
+        };
+        introAudio.onended = () => settle("ended");
+        introAudio.onerror = () => settle("error");
+        try { introAudio.currentTime = 0; } catch (err) {}
+        let playResult;
+        try {
+          playResult = introAudio.play();
+        } catch (err) {
+          settle("blocked");
+          return;
+        }
+        if (playResult && typeof playResult.then === "function") {
+          playResult.then(() => {
+            if (token !== introToken) {
+              settle("stale");
+              return;
+            }
+            if (!settled) markIntroStarted();
+          }).catch(() => settle("blocked"));
+        }
+      });
+    }
+
+    async function playIntroPreferred(token) {
+      const mp3Result = await playIntroMp3(token);
+      if (mp3Result === "ended") return true;
+      if (mp3Result === "blocked" || mp3Result === "stale") return mp3Result;
+      const speechOk = await playIntroSpeech(token);
+      if (speechOk === "stale") return "stale";
+      if (speechOk) return true;
+      return false;
+    }
+
+    async function tryAutoplayIntro() {
+      const token = introToken;
+      const result = await playIntroPreferred(token);
+      if (coverFinished || result === "stale" || token !== introToken) return;
+      if (result === true) {
+        exitAfterIntro();
+        return;
+      }
+      if (introAudio) {
+        try { introAudio.pause(); introAudio.currentTime = 0; } catch (err) {}
+      }
+      if ("speechSynthesis" in window) {
+        try { window.speechSynthesis.cancel(); } catch (err) {}
+      }
+      setCoverWaiting();
+    }
+
+    async function startIntroFromGesture() {
+      if (coverFinished || introStarted) return;
+      introToken += 1;
+      const token = introToken;
+      markIntroStarted();
+      if (introAudio) {
+        try { introAudio.pause(); introAudio.currentTime = 0; } catch (err) {}
+      }
+      if ("speechSynthesis" in window) {
+        try { window.speechSynthesis.cancel(); } catch (err) {}
+      }
+      const result = await playIntroPreferred(token);
+      if (coverFinished || result === "stale" || token !== introToken) return;
+      if (result === true) {
+        exitAfterIntro();
+        return;
+      }
+      if (result === "blocked") {
+        const speechOk = await playIntroSpeech(token);
+        if (coverFinished || token !== introToken) return;
+        if (speechOk === true) {
+          exitAfterIntro();
+          return;
+        }
+      }
+      finishCoverAndEnterQuiz();
+    }
+
+    coverStartBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      startIntroFromGesture();
+    });
+    coverViewEl.addEventListener("click", () => {
+      startIntroFromGesture();
+    });
+
+    tryAutoplayIntro();
+    setTimeout(() => {
+      if (coverFinished || introStarted) return;
+      if (!isMp3ActuallyPlaying() && !isSpeechActuallyPlaying()) {
+        setCoverWaiting();
+      }
+    }, AUTOPLAY_GRACE_MS);
   </script>
 </body>
 </html>
